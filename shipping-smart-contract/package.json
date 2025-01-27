@@ -1,0 +1,22 @@
+{
+  "name": "shipping-smart-contract",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-chai-matchers": "^2.0.8",
+    "@nomicfoundation/hardhat-ethers": "^3.0.8",
+    "chai": "^4.3.8",
+    "ethers": "^6.13.5",
+    "hardhat": "^2.22.18"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7"
+  }
+}
