@@ -50,10 +50,38 @@ export default function NewDeal() {
     }
   };
 
-  const handleDeploy = () => {
-    console.log("Deploying contract with stages:", { dealName, stages });
-    toast.success("Contract deployment initiated!");
+  const handleDeploy = async () => {
+    if (!dealName.trim() || stages.length === 0) {
+      toast.error("Please enter a deal name and add at least one stage.");
+      return;
+    }
+  
+    try {
+      const payload = JSON.stringify({ dealName, stages });
+      console.log("Sending payload:", payload); // Debugging log
+  
+      const response = await fetch("/api/storeDeal", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: payload,
+      });
+  
+      console.log("Raw response:", response); // Log response
+  
+      const data = await response.json(); // Ensure response is JSON
+      if (response.ok) {
+        toast.success("Deal successfully stored!");
+        console.log("Deal stored:", data);
+      } else {
+        toast.error(`Error: ${data.error}`);
+      }
+    } catch (error) {
+      console.error("Error storing deal:", error);
+      toast.error("Failed to store deal.");
+    }
   };
+  
+  
 
   return (
     <main className="min-h-screen flex flex-col items-center bg-gray-900 text-gray-200 p-6 font-plexmono">
