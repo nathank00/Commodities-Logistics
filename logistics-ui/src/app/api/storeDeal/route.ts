@@ -52,7 +52,7 @@ export async function POST(req: Request) {
       for (const signer of stage.signers) {
         console.log(`✍️ Inserting Signer: Address=${signer}, StageID=${stageId}`);
         await db.execute({
-          sql: `INSERT INTO signers (stage_id, address) VALUES (?, ?)`,
+          sql: `INSERT INTO signers (stage_id, wallet_address) VALUES (?, ?)`,
           args: [stageId, signer],
         });
       }

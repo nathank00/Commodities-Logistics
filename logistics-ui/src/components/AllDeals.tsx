@@ -1,53 +1,66 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 
 type Deal = {
   id: string;
   name: string;
+  createdAt: string;
 };
 
 export default function AllDeals() {
   const [deals, setDeals] = useState<Deal[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchDeals = async () => {
+    let isMounted = true; // Prevents unnecessary re-renders
+
+    async function fetchDeals() {
       try {
-        const res = await fetch("/api/getDeals");
-        const data = await res.json();
-        setDeals(data);
+        const response = await fetch("/api/deals");
+        if (!response.ok) throw new Error("Failed to fetch deals");
+
+        const data = await response.json();
+        console.log("Fetched Deals:", data); // ✅ Debugging log
+
+        if (isMounted) {
+          setDeals(data);
+          setLoading(false);
+        }
       } catch (error) {
-        console.error("Failed to fetch deals:", error);
+        console.error("Error fetching deals:", error);
+        if (isMounted) setLoading(false);
       }
-    };
+    }
 
     fetchDeals();
-  }, []);
+
+    return () => {
+      isMounted = false; // Cleanup function
+    };
+  }, []); // ✅ Runs only once
 
   return (
-    <main className="min-h-screen flex flex-col items-center bg-gray-900 text-gray-200 p-6 font-plexmono">
-      {/* Home Button (Top Right Corner) */}
-      <div className="w-full flex justify-between">
-        <div></div> {/* Empty div to balance layout */}
-        <Link href="/">
-          <button className="text-neonGreen hover:text-lime-300 text-lg">Home</button>
-        </Link>
-      </div>
+    <div className="p-6">
+      <h2 className="text-3xl font-bold text-neonGreen mb-6 text-center">All Deals</h2>
 
-      <h2 className="text-3xl font-bold text-neonGreen text-center mb-6">All Deals</h2>
-
-      {deals.length === 0 ? (
-        <p className="text-gray-500 text-lg">No deals found.</p>
+      {loading ? (
+        <p className="text-gray-400 text-center">Loading deals...</p>
+      ) : deals.length === 0 ? (
+        <p className="text-gray-500 text-center">No deals found.</p>
       ) : (
-        <div className="w-full max-w-2xl space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {deals.map((deal) => (
-            <div key={deal.id} className="border border-neonGreen p-4 rounded-lg bg-gray-800 shadow-lg">
-              <h3 className="text-xl font-bold text-neonGreen">{deal.name}</h3>
-            </div>
+            <Link key={deal.id} href={`/deal/${deal.id}`}>
+              <div className="bg-gray-800 border border-neonGreen p-4 rounded-lg shadow-lg cursor-pointer hover:bg-gray-700 transition">
+                <h3 className="text-xl font-semibold text-neonGreen">{deal.name}</h3>
+                <p className="text-gray-400 text-sm mt-2">Created: {new Date(deal.createdAt).toLocaleDateString()}</p>
+              </div>
+            </Link>
           ))}
         </div>
       )}
-    </main>
+    </div>
   );
 }
